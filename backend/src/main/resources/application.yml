@@ -3,6 +3,13 @@ spring:
     current-web-url: http://localhost:8085
   profiles:
     active: ${ACTIVE_PROFILE:dev}
+
+# Application-specific settings
+app:
+  cors:
+    # Comma-separated list of allowed frontend origins
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://127.0.0.1:3000}
+
   jackson:
     default-property-inclusion: non_null
     serialization:
@@ -36,21 +43,21 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         formate_sql: true
   mail:
-      host: ${EMAIL_HOST}
-      port: ${EMAIL_PORT}
-      username: ${EMAIL_ID}
-      password: ${EMAIL_PASSWORD}
-      default-encoding: UTF-8
-      properties:
-        mail:
-          smtp:
-            writetimeout: 10000
-            connectiontimeout: 10000
-            timeout: 10000
-            auth: true
-            starttls:
-              enable: true
-              required: true
+    host: ${EMAIL_HOST}
+    port: ${EMAIL_PORT}
+    username: ${EMAIL_ID}
+    password: ${EMAIL_PASSWORD}
+    default-encoding: UTF-8
+    properties:
+      mail:
+        smtp:
+          writetimeout: 10000
+          connectiontimeout: 10000
+          timeout: 10000
+          auth: true
+          starttls:
+            enable: true
+            required: true
   logging:
     level:
       root: INFO
@@ -72,8 +79,6 @@ server:
         secure: true
         path: /
 
-
-
       #    init:
       #      mode: never #says if we should run data files
       #      continue-on-error: false
@@ -88,3 +93,20 @@ server:
       #    verify:
       #      host: ${VERIFY_EMAIL_HOST}
 
+# Actuator configuration for health checks (Railway/AWS)
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: when_authorized
+      probes:
+        enabled: true
+  health:
+    livenessState:
+      enabled: true
+    readinessState:
+      enabled: true

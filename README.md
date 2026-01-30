@@ -65,6 +65,7 @@ Run these in the `frontend/` directory:
 ## Running Locally
 
 ### Prerequisites
+
 - Java 21
 - Node.js (v18+ recommended)
 - Docker & Docker Compose
@@ -106,6 +107,19 @@ Run these in the `frontend/` directory:
   - Tests in `backend/src/test/java/`
 - **Frontend:**
   - Run with npm: `npm test`
+
+---
+
+## Deployment
+
+For production deployment instructions, see the [Deployment Guide](deploy/README.md).
+
+**Supported Platforms:**
+
+- **Railway** - Primary deployment target (PaaS)
+- **AWS** - ECS, Elastic Beanstalk, or direct EC2 (uses Docker)
+
+Both backend and frontend include Dockerfiles and Railway configuration files for easy deployment.
 
 ---
 
