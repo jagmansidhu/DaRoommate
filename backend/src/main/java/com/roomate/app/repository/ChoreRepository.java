@@ -10,20 +10,23 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
 @Repository
 public interface ChoreRepository extends JpaRepository<ChoreEntity, Long> {
     List<ChoreEntity> findByRoomAndDueAtAfter(RoomEntity room, LocalDateTime date);
+
     List<ChoreEntity> findByRoom(RoomEntity room);
+
     void deleteById(UUID choreId);
+
     @Query("SELECT c FROM ChoreEntity c " +
             "LEFT JOIN FETCH c.assignedToMember m " +
             "LEFT JOIN FETCH m.user " +
             "WHERE c.room = :room")
     List<ChoreEntity> findByRoomWithMemberAndUser(@Param("room") RoomEntity room);
+
     void deleteAllByRoomIdAndChoreName(UUID roomId, String choreName);
 
     @Query("SELECT u FROM ChoreEntity u WHERE u.assignedToMember.id IN :roomMemberIds")

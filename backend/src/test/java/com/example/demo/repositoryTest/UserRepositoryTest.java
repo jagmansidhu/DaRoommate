@@ -50,6 +50,6 @@ public class UserRepositoryTest {
         Optional<UserEntity> findUser = userRepository.findById(insertedUser.getId());
 
         assertThat(findUser.isPresent()).isTrue();
-        assertThat(findUser.get().getAuthId()).isEqualTo(insertedUser.getAuthId());
+        assertThat(findUser.get().getEmail()).isEqualTo(insertedUser.getEmail());
     }
 }
