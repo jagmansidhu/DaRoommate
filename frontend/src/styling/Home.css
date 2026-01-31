@@ -4,6 +4,13 @@
    ========================================== */
 
 /* ==========================================
+   Global Smooth Scrolling
+   ========================================== */
+html {
+  scroll-behavior: smooth;
+}
+
+/* ==========================================
    Landing Page Container
    ========================================== */
 .landing-page {
@@ -12,19 +19,43 @@
 }
 
 /* ==========================================
+   Shared Section Styles
+   ========================================== */
+.landing-page section {
+  padding: 120px 24px;
+}
+
+.container {
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 80px;
+}
+
+.section-header h2 {
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  margin-bottom: 0;
+}
+
+/* ==========================================
    Hero Section
    ========================================== */
 .hero-section {
-  min-height: 90vh;
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--spacing-8) var(--spacing-6);
-  background-color: var(--bg-primary);
+  padding-top: 80px;
 }
 
 .hero-content {
-  max-width: 900px;
+  max-width: 720px;
   margin: 0 auto;
   text-align: center;
 }
@@ -33,19 +64,19 @@
   display: inline-block;
   font-size: 0.8125rem;
   font-weight: 500;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--primary-600);
-  margin-bottom: var(--spacing-6);
+  margin-bottom: 24px;
 }
 
 .hero-title {
-  font-size: clamp(2.5rem, 8vw, 4.5rem);
+  font-size: clamp(2.5rem, 8vw, 4rem);
   font-weight: 600;
-  line-height: 1.05;
-  letter-spacing: -0.025em;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
   color: var(--text-primary);
-  margin-bottom: var(--spacing-6);
+  margin-bottom: 24px;
 }
 
 .hero-title .highlight {
@@ -56,36 +87,36 @@
 }
 
 .hero-subtitle {
-  font-size: clamp(1.125rem, 2.5vw, 1.375rem);
+  font-size: 1.25rem;
   font-weight: 400;
   line-height: 1.5;
   color: var(--text-tertiary);
-  max-width: 640px;
-  margin: 0 auto var(--spacing-10);
+  max-width: 540px;
+  margin: 0 auto 40px;
 }
 
 .hero-buttons {
   display: flex;
   justify-content: center;
-  gap: var(--spacing-4);
+  gap: 16px;
 }
 
 .hero-buttons .btn {
-  font-size: 1.0625rem;
-  padding: 0.875rem 2rem;
+  font-size: 1rem;
+  padding: 14px 28px;
   border-radius: 980px;
   font-weight: 500;
+  transition: all 0.2s ease;
 }
 
 .hero-buttons .btn-primary {
   background-color: var(--primary-600);
-  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+  color: white;
 }
 
 .hero-buttons .btn-primary:hover {
   background-color: var(--primary-500);
-  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
-  transform: translateY(-1px);
+  transform: scale(1.02);
 }
 
 .hero-buttons .btn-secondary {
@@ -99,77 +130,34 @@
 }
 
 [data-theme="dark"] .hero-buttons .btn-secondary:hover {
-  background-color: rgba(99, 102, 241, 0.1);
+  background-color: rgba(20, 184, 166, 0.1);
 }
 
 /* ==========================================
    Features Section
    ========================================== */
-.features-section {
-  padding: var(--spacing-24) var(--spacing-6);
-  background-color: var(--bg-primary);
-}
-
-.features-section .container {
-  max-width: 1120px;
-}
-
-.section-header {
-  text-align: center;
-  margin-bottom: var(--spacing-16);
-}
-
-.section-header h2 {
-  font-size: clamp(1.75rem, 4vw, 2.75rem);
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  color: var(--text-primary);
-  margin-bottom: var(--spacing-4);
-}
-
-.section-header p {
-  font-size: 1.125rem;
-  color: var(--text-tertiary);
-  margin-bottom: 0;
-}
-
 .features-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: var(--spacing-8);
+  gap: 64px 48px;
+  max-width: 960px;
+  margin: 0 auto;
 }
 
 .feature-card {
   text-align: center;
-  padding: var(--spacing-8) var(--spacing-4);
-}
-
-.feature-icon {
-  width: 56px;
-  height: 56px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto var(--spacing-5);
-  background-color: var(--primary-50);
-  border-radius: var(--radius-xl);
-  font-size: 1.5rem;
-}
-
-[data-theme="dark"] .feature-icon {
-  background-color: rgba(20, 184, 166, 0.12);
 }
 
 .feature-card h3 {
-  font-size: 1.125rem;
+  font-size: 1.25rem;
   font-weight: 600;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
   color: var(--text-primary);
-  margin-bottom: var(--spacing-2);
+  margin-bottom: 12px;
 }
 
 .feature-card p {
-  font-size: 0.9375rem;
+  font-size: 1rem;
   line-height: 1.6;
   color: var(--text-tertiary);
   margin-bottom: 0;
@@ -178,67 +166,38 @@
 /* ==========================================
    How It Works
    ========================================== */
-.how-it-works-section {
-  padding: var(--spacing-24) var(--spacing-6);
-  background-color: var(--bg-primary);
-}
-
-.how-it-works-section .container {
-  max-width: 960px;
-}
-
 .steps-container {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-12);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 64px 48px;
+  max-width: 960px;
+  margin: 0 auto;
 }
 
 .step-item {
-  display: grid;
-  grid-template-columns: 80px 1fr;
-  gap: var(--spacing-8);
-  align-items: start;
+  text-align: center;
 }
 
-.step-number {
-  width: 56px;
-  height: 56px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: var(--text-primary);
-  color: var(--bg-primary);
-  font-size: 1.375rem;
+.step-item h3 {
+  font-size: 1.25rem;
   font-weight: 600;
-  border-radius: var(--radius-full);
-}
-
-.step-content h3 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
   color: var(--text-primary);
-  margin-bottom: var(--spacing-2);
+  margin-bottom: 12px;
 }
 
-.step-content p {
-  font-size: 1.0625rem;
+.step-item p {
+  font-size: 1rem;
   line-height: 1.6;
   color: var(--text-tertiary);
   margin-bottom: 0;
-  max-width: 480px;
 }
 
 /* ==========================================
    CTA Section
    ========================================== */
-.cta-section {
-  padding: var(--spacing-24) var(--spacing-6);
-  background-color: var(--bg-primary);
-}
-
 .cta-content {
-  max-width: 680px;
+  max-width: 600px;
   margin: 0 auto;
   text-align: center;
 }
@@ -248,18 +207,18 @@
   font-weight: 600;
   letter-spacing: -0.02em;
   color: var(--text-primary);
-  margin-bottom: var(--spacing-4);
+  margin-bottom: 16px;
 }
 
 .cta-content p {
   font-size: 1.125rem;
   color: var(--text-tertiary);
-  margin-bottom: var(--spacing-8);
+  margin-bottom: 32px;
 }
 
 .cta-buttons .btn {
-  font-size: 1.0625rem;
-  padding: 0.875rem 2.25rem;
+  font-size: 1rem;
+  padding: 14px 32px;
   border-radius: 980px;
 }
 
@@ -267,7 +226,7 @@
    Footer
    ========================================== */
 .landing-footer {
-  padding: var(--spacing-12) var(--spacing-6);
+  padding: 48px 24px;
   background-color: var(--bg-primary);
   border-top: 1px solid var(--border-light);
 }
@@ -281,14 +240,14 @@
 }
 
 .footer-logo {
-  font-size: 1.25rem;
+  font-size: 1.125rem;
   font-weight: 600;
   color: var(--text-primary);
 }
 
 .footer-links {
   display: flex;
-  gap: var(--spacing-8);
+  gap: 32px;
 }
 
 .footer-links a {
@@ -311,20 +270,31 @@
    Responsive Design
    ========================================== */
 @media (max-width: 1024px) {
-  .features-grid {
+  .features-grid,
+  .steps-container {
     grid-template-columns: repeat(2, 1fr);
+    gap: 48px 32px;
   }
 }
 
 @media (max-width: 768px) {
+  .landing-page section {
+    padding: 80px 24px;
+  }
+
+  .section-header {
+    margin-bottom: 48px;
+  }
+
   .hero-section {
     min-height: auto;
-    padding: var(--spacing-16) var(--spacing-6);
+    padding: 120px 24px 80px;
   }
 
   .hero-buttons {
     flex-direction: column;
-    gap: var(--spacing-3);
+    align-items: center;
+    gap: 12px;
   }
 
   .hero-buttons .btn {
@@ -332,54 +302,31 @@
     max-width: 280px;
   }
 
-  .features-section,
-  .how-it-works-section,
-  .cta-section {
-    padding: var(--spacing-16) var(--spacing-6);
-  }
-
-  .features-grid {
+  .features-grid,
+  .steps-container {
     grid-template-columns: 1fr;
-    gap: var(--spacing-4);
-  }
-
-  .feature-card {
-    padding: var(--spacing-8) var(--spacing-6);
-  }
-
-  .step-item {
-    grid-template-columns: 1fr;
-    gap: var(--spacing-4);
-    text-align: center;
-  }
-
-  .step-number {
-    margin: 0 auto;
-  }
-
-  .step-content p {
-    max-width: none;
+    gap: 40px;
   }
 
   .footer-content {
     flex-direction: column;
-    gap: var(--spacing-6);
+    gap: 24px;
     text-align: center;
   }
 
   .footer-links {
     flex-wrap: wrap;
     justify-content: center;
-    gap: var(--spacing-4);
+    gap: 16px;
   }
 }
 
 @media (max-width: 420px) {
   .hero-title {
-    font-size: 2.25rem;
+    font-size: 2rem;
   }
 
   .section-header h2 {
-    font-size: 1.625rem;
+    font-size: 1.5rem;
   }
 }

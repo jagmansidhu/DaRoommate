@@ -33,36 +33,29 @@ const Home = () => {
                 <div className="container">
                     <div className="section-header">
                         <h2>Built for shared spaces</h2>
-                        <p>Everything you need to manage your home, together.</p>
                     </div>
                     <div className="features-grid">
                         <div className="feature-card">
-                            <div className="feature-icon">📋</div>
                             <h3>Chores</h3>
                             <p>Rotating schedules that actually work. Everyone knows what's expected.</p>
                         </div>
                         <div className="feature-card">
-                            <div className="feature-icon">💰</div>
                             <h3>Expenses</h3>
                             <p>Split bills fairly. Track who owes what with transparent ledgers.</p>
                         </div>
                         <div className="feature-card">
-                            <div className="feature-icon">🛒</div>
                             <h3>Groceries</h3>
                             <p>Shared lists that sync instantly. No more duplicate purchases.</p>
                         </div>
                         <div className="feature-card">
-                            <div className="feature-icon">📅</div>
                             <h3>Calendar</h3>
                             <p>Shared events and reminders. Stay on the same page.</p>
                         </div>
                         <div className="feature-card">
-                            <div className="feature-icon">🔔</div>
                             <h3>Reminders</h3>
                             <p>Gentle nudges so nothing slips through the cracks.</p>
                         </div>
                         <div className="feature-card">
-                            <div className="feature-icon">👥</div>
                             <h3>Rooms</h3>
                             <p>Create spaces for different living situations. Simple invites.</p>
                         </div>
@@ -78,25 +71,16 @@ const Home = () => {
                     </div>
                     <div className="steps-container">
                         <div className="step-item">
-                            <div className="step-number">1</div>
-                            <div className="step-content">
-                                <h3>Create a room</h3>
-                                <p>Set up your shared space in seconds. Give it a name that feels like home.</p>
-                            </div>
+                            <h3>Create a room</h3>
+                            <p>Set up your shared space in seconds. Give it a name that feels like home.</p>
                         </div>
                         <div className="step-item">
-                            <div className="step-number">2</div>
-                            <div className="step-content">
-                                <h3>Invite your roommates</h3>
-                                <p>Share a simple code. They're in instantly, no friction.</p>
-                            </div>
+                            <h3>Invite your roommates</h3>
+                            <p>Share a simple code. They're in instantly, no friction.</p>
                         </div>
                         <div className="step-item">
-                            <div className="step-number">3</div>
-                            <div className="step-content">
-                                <h3>Start organizing</h3>
-                                <p>Add chores, expenses, and groceries. Watch your household run smoother.</p>
-                            </div>
+                            <h3>Start organizing</h3>
+                            <p>Add chores, expenses, and groceries. Watch your household run smoother.</p>
                         </div>
                     </div>
                 </div>
@@ -118,7 +102,7 @@ const Home = () => {
             {/* Footer */}
             <footer className="landing-footer">
                 <div className="footer-content">
-                    <span className="footer-logo">DaRoomate</span>
+                    <span className="footer-logo">DaRoommate</span>
                     <div className="footer-links">
                         <a href="#features">Features</a>
                         <a href="#about">About</a>
