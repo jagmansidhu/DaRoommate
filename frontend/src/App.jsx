@@ -6,9 +6,7 @@ import Dashboard from './webpages/Dashboard';
 import Profile from './webpages/Profile';
 import Home from './webpages/Home';
 import useProfileCompletionRedirect from "./component/userProfileRedirection";
-import CompleteProfile from "./webpages/CompleteProfile";
 import Personal from "./webpages/profileRedirect/Personal";
-import VerificationPopup from "./component/VerificationPopup";
 import Rooms from "./webpages/room/Rooms";
 import './styling/App.css';
 import RoomDetailsPageWrapper from "./webpages/room/RoomDetailWrapper";
@@ -53,7 +51,24 @@ const AuthProvider = ({children}) => {
                 });
 
                 if (res.ok) {
-                    setIsAuthenticated(true);
+                    // Verify it's actually JSON and has expected content
+                    const contentType = res.headers.get("content-type");
+                    if (contentType && contentType.indexOf("application/json") !== -1) {
+                        const data = await res.json();
+                        // Assuming the backend returns { username: "..." } or similar on success
+                        if (data && (data.username || data.email || data.authenticated === true)) {
+                           setIsAuthenticated(true);
+                        } else {
+                           // Valid JSON but unexpected content - treat as unauth
+                           // Unless the backend just returns 200 OK empty body? 
+                           // Step 128 showed it returns Map.of("username", user)
+                           setIsAuthenticated(true);
+                        }
+                    } else {
+                         // Not JSON (likely HTML error page)
+                         console.warn("Auth check returned non-JSON:", contentType);
+                         setIsAuthenticated(false);
+                    }
                 } else {
                     setIsAuthenticated(false);
                 }
@@ -83,6 +98,7 @@ const AuthProvider = ({children}) => {
         }
 
         setIsAuthenticated(false);
+        window.location.href = '/';
     };
 
     return (
@@ -175,7 +191,7 @@ const CheckEmailPage = () => {
 const AppContent = () => {
     const {isAuthenticated, isLoading, logout} = useAuth();
     const navigate = useNavigate();
-    const [userVerified, setUserVerified] = useState(true);
+    const [userVerified, setUserVerified] = useState(null); // null = unknown, true/false = known
     const hideNavbarPaths = ['/complete-profile'];
 
     useProfileCompletionRedirect();
@@ -190,27 +206,29 @@ const AppContent = () => {
                     });
                     if (res.ok) {
                         const data = await res.json();
-                        if (!data.verified) {
-                            setUserVerified(false);
-                        } else {
-                            setUserVerified(true);
-                            if (window.location.pathname === '/') navigate('/dashboard');
-                        }
+                        setUserVerified(data.verified);
+                    } else {
+                        setUserVerified(false);
                     }
                 } catch (err) {
                     console.error('Error checking verification status:', err);
+                    setUserVerified(false);
                 }
             };
 
             checkVerification();
+        } else if (!isAuthenticated && !isLoading) {
+            // Reset verification state when logged out
+            setUserVerified(null);
         }
-    }, [isAuthenticated, isLoading, navigate, logout]);
+    }, [isAuthenticated, isLoading]);
 
-    if (isLoading) {
+    // Show loading while checking auth OR while checking verification for authenticated users
+    if (isLoading || (isAuthenticated && userVerified === null)) {
         return (
             <div className="loading">
                 <div className="spinner"></div>
-                <span>Loading authentication status...</span>
+                <span>Loading...</span>
             </div>
         );
     }

@@ -47,7 +47,8 @@ public class AuthController {
     @PostMapping("/resend-verification")
     public ResponseEntity<String> resendVerification(@AuthenticationPrincipal UserDetails user) {
         UserEntity usere = userRepository.getUserByEmail(user.getUsername());
-//        System.out.println(usere.getEmail() + " " + user.getUsername() + " " + usere.isEnabled());
+        // System.out.println(usere.getEmail() + " " + user.getUsername() + " " +
+        // usere.isEnabled());
         if (!user.isEnabled()) {
             return ResponseEntity.badRequest().body("User already verified or not logged in");
         }
@@ -74,16 +75,17 @@ public class AuthController {
         return ResponseEntity.ok(result);
     }
 
-
     @PutMapping("/updateProfile")
-    public ResponseEntity<UserEntity> updateProfile(@Valid @RequestBody UpdateProfileDto req, HttpServletRequest request) {
+    public ResponseEntity<UserEntity> updateProfile(@Valid @RequestBody UpdateProfileDto req,
+            HttpServletRequest request) {
         String email = request.getUserPrincipal().getName();
         UserEntity updatedUser = userService.updateUserProfile(email, req);
         return ResponseEntity.ok(updatedUser);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthDto> login(@Valid @RequestBody LoginDto req, HttpServletRequest request,HttpServletResponse response) {
+    public ResponseEntity<AuthDto> login(@Valid @RequestBody LoginDto req, HttpServletRequest request,
+            HttpServletResponse response) {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
@@ -147,10 +149,16 @@ public class AuthController {
         }
     }
 
-
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletResponse response) {
-        response.setHeader("Set-Cookie", "jwt=; Path=/; HttpOnly; Max-Age=0; SameSite=Lax");
+        ResponseCookie cookie = ResponseCookie.from("jwt", "")
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .sameSite("None")
+                .maxAge(0)
+                .build();
+        response.setHeader("Set-Cookie", cookie.toString());
         return ResponseEntity.ok().build();
     }
 }
