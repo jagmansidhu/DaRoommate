@@ -25,7 +25,7 @@ export const useAuth = () => useContext(AuthContext);
 const ThemeProvider = ({children}) => {
     const [isDarkMode, setIsDarkMode] = useState(() => {
         const saved = localStorage.getItem('darkMode');
-        return saved ? JSON.parse(saved) : true;
+        return saved ? JSON.parse(saved) : false;
     });
 
     useEffect(() => {
@@ -94,21 +94,14 @@ const AuthProvider = ({children}) => {
 
 
 const LoggedOutNavbar = () => {
-    const {toggleTheme, isDarkMode} = useTheme();
-
     return (
         <header className="App-header">
             <div className="header-content">
                 <Link to="/" className="logo">
-                    <div className="logo-icon">D</div>
-                    <span>DaROOmate</span>
+                    <span>DaRoommate</span>
                 </Link>
                 <nav className="nav">
-                    <Link to="/" className="nav-link">Home</Link>
-                    <Link to="/login" className="nav-link">Login</Link>
-                    <button onClick={toggleTheme} className="theme-toggle">
-                        {isDarkMode ? "☀️" : "🌙"}
-                    </button>
+                    <Link to="/login" className="btn btn-secondary">Sign In</Link>
                 </nav>
             </div>
         </header>
@@ -123,8 +116,7 @@ const LoggedInNavbar = () => {
         <header className="App-header">
             <div className="header-content">
                 <Link to="/dashboard" className="logo">
-                    <div className="logo-icon">D</div>
-                    <span>DaROOmate</span>
+                    <span>DaRoommate</span>
                 </Link>
                 <nav className="nav">
                     <Link to="/dashboard" className="nav-link">Dashboard</Link>

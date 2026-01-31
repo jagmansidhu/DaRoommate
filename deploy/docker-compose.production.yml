@@ -1,15 +1,3 @@
-# DaRoomate Production Docker Compose
-#
-# Usage:
-#   cp env.example .env
-#   # Edit .env with your values
-#   docker compose -f docker-compose.production.yml up --build
-#
-# This file is compatible with:
-# - Local testing
-# - AWS ECS (via ecs-cli compose)
-# - Docker Swarm
-
 services:
   backend:
     build:

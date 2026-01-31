@@ -13,6 +13,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+/**
+ * Integration tests for User Controller endpoints.
+ * Tests public endpoints that don't require email verification.
+ */
 @AutoConfigureMockMvc
 @SpringBootTest(classes = StartOneApplication.class)
 @Transactional
@@ -23,26 +27,18 @@ class UserControllerTest {
     private MockMvc mockMvc;
 
     @Test
-    public void testRegisterUser() throws Exception {
-        String json = """
-              {
-                "firstName": "Jow",
-                "lastName": "Jeffe",
-                "email": "test2@gmail.com",
-                "phone": "1234567890"
-            }
-        """;
-
-        mockMvc.perform(post("/user/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json))
-                .andExpect(status().isOk());
+    public void testUserStatusEndpoint_NoAuth() throws Exception {
+        mockMvc.perform(get("/user/status"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.logged_in").value(false));
     }
 
     @Test
-    public void testGetAllUsers() throws Exception {
-        mockMvc.perform(get("/user"))
+    public void testActuatorHealthEndpoint() throws Exception {
+        mockMvc.perform(get("/actuator/health"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.status").value("UP"));
     }
 }

@@ -1,6 +1,6 @@
 package com.roomate.app.exceptions;
 
-public class UserApiError extends Exception{
+public class UserApiError extends RuntimeException {
     public UserApiError(String message) {
         super(message);
     }

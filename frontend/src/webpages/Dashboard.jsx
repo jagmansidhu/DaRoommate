@@ -1,118 +1,122 @@
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import '../styling/Dashboard.css';
 
 const Dashboard = () => {
     const [email, setEmail] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [authError, setAuthError] = useState(null); // 🔑 separate error
-    const [dataError, setDataError] = useState(null);
     const [chores, setChores] = useState([]);
     const [utilities, setUtilities] = useState([]);
 
-    // Fetch user once
     useEffect(() => {
-        const fetchUser = async () => {
-            try {
-                const res = await fetch(`${process.env.REACT_APP_BASE_API_URL}/user/status`, {
-                    method: 'GET',
-                    withCredentials: true,
-                    credentials: 'include',
-                });
-                if (!res.ok) throw new Error('Not authenticated');
-                const data = await res.json();
-                setEmail(data.username || data.email);
-            } catch (err) {
-                setAuthError(err.message);
-            } finally {
+        axios.get(`${process.env.REACT_APP_BASE_API_URL}/user/status`, { withCredentials: true })
+            .then(res => {
+                setEmail(res.data.username);
                 setLoading(false);
-            }
-        };
-        fetchUser();
+            })
+            .catch(() => setLoading(false));
     }, []);
 
-    // Fetch chores & utilities once user is known
     useEffect(() => {
         if (!email) return;
-        const fetchData = async () => {
-            try {
-                const [choresRes, utilitiesRes] = await Promise.all([
-                    fetch(`${process.env.REACT_APP_BASE_API_URL}/api/chores/upcoming?id=${email}`, {
-                        method: 'GET',
-                        withCredentials: true,
-                        credentials: 'include',
-                    }),
-                    fetch(`${process.env.REACT_APP_BASE_API_URL}/api/utility/upcoming?id=${email}`, {
-                        method: 'GET',
-                        withCredentials: true,
-                        credentials: 'include',
-                    }),
-                ]);
-                if (choresRes.ok) setChores(await choresRes.json());
-                if (utilitiesRes.ok) setUtilities(await utilitiesRes.json());
-            } catch (err) {
-                setDataError(err.message);
-            }
-        };
-        fetchData();
+        axios.get(`${process.env.REACT_APP_BASE_API_URL}/api/chores/user/me`, { withCredentials: true })
+            .then(res => setChores(res.data || []))
+            .catch(() => {});
+        axios.get(`${process.env.REACT_APP_BASE_API_URL}/api/utility/user/me`, { withCredentials: true })
+            .then(res => setUtilities(res.data || []))
+            .catch(() => {});
     }, [email]);
 
     if (loading) {
-        return <div>Loading...</div>;
-    }
-
-    // 🔑 Only authError means “log in required”
-    if (authError || !email) {
         return (
-            <div>
-                <h1>Dashboard</h1>
-                <p>Please log in to access this resource.</p>
+            <div className="loading">
+                <div className="spinner spinner-lg"></div>
+                <p>Loading dashboard...</p>
             </div>
         );
     }
 
-    const upcomingChores = chores
-        .filter(chore => new Date(chore.dueAt) > new Date())
-        .sort((a, b) => new Date(a.dueAt) - new Date(b.dueAt));
-    const upcomingUtilities = utilities;
+    const upcomingChores = chores.slice(0, 5);
+    const upcomingUtilities = utilities.slice(0, 5);
 
     return (
         <div className="dashboard-container">
+            {/* Dashboard Header */}
             <div className="dashboard-header">
                 <h1>Dashboard</h1>
-                <p>Welcome back, {email}!</p>
+                <p>Welcome back, {email}</p>
             </div>
+
+            {/* Stats Overview */}
+            <div className="dashboard-stats">
+                <div className="stat-card">
+                    <div className="stat-icon">📋</div>
+                    <div className="stat-value">{chores.length}</div>
+                    <div className="stat-label">Pending Chores</div>
+                </div>
+                <div className="stat-card">
+                    <div className="stat-icon">💰</div>
+                    <div className="stat-value">{utilities.length}</div>
+                    <div className="stat-label">Upcoming Bills</div>
+                </div>
+                <div className="stat-card">
+                    <div className="stat-icon">🏠</div>
+                    <div className="stat-value">—</div>
+                    <div className="stat-label">Active Rooms</div>
+                </div>
+                <div className="stat-card">
+                    <div className="stat-icon">✓</div>
+                    <div className="stat-value">—</div>
+                    <div className="stat-label">Completed This Week</div>
+                </div>
+            </div>
+
+            {/* Main Content Grid */}
             <div className="dashboard-content">
-                {/*{dataError && <p className="error">⚠️ Failed to load some data: {dataError}</p>}*/}
+                {/* Upcoming Chores */}
+                <div className="dashboard-section">
+                    <h3>Upcoming Chores</h3>
+                    {upcomingChores.length > 0 ? (
+                        <ul>
+                            {upcomingChores.map((chore, index) => (
+                                <li key={index}>
+                                    <div className="item-icon">📋</div>
+                                    <div className="item-content">
+                                        <div className="item-title">{chore.name || chore.title || 'Untitled Chore'}</div>
+                                        <div className="item-meta">
+                                            {chore.dueDate ? `Due: ${new Date(chore.dueDate).toLocaleDateString()}` : 'No due date'}
+                                        </div>
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <p>No upcoming chores. You're all caught up! 🎉</p>
+                    )}
+                </div>
 
-                <h2>Upcoming Chores</h2>
-                {upcomingChores.length > 0 ? (
-                    <ul>
-                        {upcomingChores.map(chore => (
-                            <li key={chore.id}>
-                                {chore.choreName}
-                                - Due: {new Date(chore.dueAt).toLocaleDateString()}
-                                - Room: {chore.roomName}
-                            </li>
-                        ))}
-                    </ul>
-                ) : (
-                    <p>No upcoming chores.</p>
-                )}
-
-                <h2>Upcoming Utilities</h2>
-                {upcomingUtilities.length > 0 ? (
-                    <ul>
-                        {upcomingUtilities.map(utility => (
-                            <li key={utility.id}>
-                                {utility.utilityName}
-                                - Price: ${utility.utilityPrice}
-                                - Room: {utility.roomName}
-                            </li>
-                        ))}
-                    </ul>
-                ) : (
-                    <p>No upcoming utilities.</p>
-                )}
+                {/* Upcoming Utilities */}
+                <div className="dashboard-section">
+                    <h3>Upcoming Bills</h3>
+                    {upcomingUtilities.length > 0 ? (
+                        <ul>
+                            {upcomingUtilities.map((utility, index) => (
+                                <li key={index}>
+                                    <div className="item-icon">💰</div>
+                                    <div className="item-content">
+                                        <div className="item-title">{utility.name || utility.title || 'Untitled Bill'}</div>
+                                        <div className="item-meta">
+                                            {utility.dueDate ? `Due: ${new Date(utility.dueDate).toLocaleDateString()}` : 'No due date'}
+                                            {utility.amount && ` • $${utility.amount}`}
+                                        </div>
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <p>No upcoming bills. All caught up! 💸</p>
+                    )}
+                </div>
             </div>
         </div>
     );

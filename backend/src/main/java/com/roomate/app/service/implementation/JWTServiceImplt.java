@@ -20,7 +20,7 @@ import java.util.function.Function;
 
 @Service
 public class JWTServiceImplt implements JWTService {
-    private static final int secondsToAdd = 60*60*24*24;
+    private static final int TOKEN_EXPIRY_SECONDS = 4 * 60 * 60; // 4 hours
     @Value("${spring.jwt.secret}")
     private String SECRET;
     private SecretKey key;
@@ -40,7 +40,7 @@ public class JWTServiceImplt implements JWTService {
         Instant now = Instant.now();
         UserEntity user = (UserEntity) userDetails;
 
-        Instant expiry = now.plusSeconds(secondsToAdd);
+        Instant expiry = now.plusSeconds(TOKEN_EXPIRY_SECONDS);
 
         return Jwts.builder()
                 .header()
@@ -69,7 +69,6 @@ public class JWTServiceImplt implements JWTService {
                     .verifyWith(key)
                     .build()
                     .parseSignedClaims(token);
-
 
             return true;
         } catch (JwtException | IllegalArgumentException e) {

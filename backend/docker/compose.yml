@@ -1,20 +1,43 @@
+# Local Development Docker Compose
+#
+# Usage:
+#   docker compose up -d                    # Start dev database
+#   docker compose --profile test up -d     # Start test database
+#
+# Set environment variables in a .env file or export them:
+#   POSTGRES_USER=postgres
+#   POSTGRES_PASSWORD=password
+#   POSTGRES_DB=daroomate
+
 services:
-    postgresdb:
-        container_name: RoomateAppDB
-        image: postgres:17.5
-        environment:
-            POSTGRES_USER: ${POSTGRES_USER}
-            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-            POSTGRES_DB: ${POSTGRES_DB}
-        expose:
-            - 5432
-        ports:
-            - 5432:5432
-        volumes:
-            - postgres_db:/var/lib/postgresql/data
+  # Development database
+  postgresdb:
+    container_name: RoomateAppDB
+    image: postgres:17
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_DB: ${POSTGRES_DB:-daroomate}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+
+  # Test database (use --profile test to start)
+  postgres_test:
+    container_name: RoomateAppDBTest
+    image: postgres:17
+    profiles:
+      - test
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_DB: ${POSTGRES_DB:-daroomate_test}
+    ports:
+      - "5433:5432" # Different port to avoid conflict
+    volumes:
+      - postgres_test_data:/var/lib/postgresql/data
 
 volumes:
-    postgres_db:
-
-
-
+  postgres_dev_data:
+  postgres_test_data:

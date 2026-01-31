@@ -1,14 +1,16 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
+import '../../styling/Components.css';
 
 const Register = () => {
     const navigate = useNavigate();
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
-    const [password, setPassword] = useState("");
+    const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
     const [showPasswordRules, setShowPasswordRules] = useState(false);
 
     const passwordRules = [
@@ -37,12 +39,14 @@ const Register = () => {
             return;
         }
 
+        setIsLoading(true);
+        setError('');
+
         try {
             await axios.post(`${process.env.REACT_APP_BASE_API_URL}/user/register`, {
                 firstName,
                 lastName,
                 email,
-
                 password
             });
             navigate('/login');
@@ -59,76 +63,140 @@ const Register = () => {
                 setError('An unknown error occurred.');
             }
             console.error(err);
+        } finally {
+            setIsLoading(false);
         }
     };
 
     return (
-        <div className="register-container">
-            <h2>Register</h2>
-            {error && <p className="error-text">{error}</p>}
-            <form onSubmit={handleSubmit}>
-                <label>
-                    First Name:
-                    <br/>
-                    <input
-                        type="text"
-                        value={firstName}
-                        onChange={e => setFirstName(e.target.value)}
-                        required
-                    />
-                </label><br/>
-                <label>
-                    Last Name:
-                    <br/>
-                    <input
-                        type="text"
-                        value={lastName}
-                        onChange={e => setLastName(e.target.value)}
-                        required
-                    />
-                </label><br/>
-                <label>
-                    Email:
-                    <br/>
-                    <input
-                        type="email"
-                        value={email}
-                        onChange={e => setEmail(e.target.value)}
-                        required
-                    />
-                </label><br/>
-                <label>
-                    Password:
-                    <br/>
-                    <input
-                        type="password"
-                        value={password}
-                        onChange={e => setPassword(e.target.value)}
-                        onFocus={() => setShowPasswordRules(true)}
-                        onBlur={() => setShowPasswordRules(false)}
-                        required
-                    />
-                </label>
+        <div className="auth-container">
+            <div className="auth-card">
+                <div className="auth-header">
+                    <h1>Create an account</h1>
+                    <p>Join DaRoomate to manage your shared living</p>
+                </div>
 
-                {showPasswordRules && (
-                    <ul style={{ listStyle: "none", paddingLeft: 0 }}>
-                        {passwordRules.map((rule, i) => (
-                            <li
-                                key={i}
-                                style={{
-                                    color: rule.test.test(password) ? "green" : "red",
-                                    fontSize: "0.9em"
-                                }}
-                            >
-                                {rule.message}
-                            </li>
-                        ))}
-                    </ul>
+                {error && (
+                    <div className="error-message">
+                        <span className="error-icon">⚠️</span>
+                        {error}
+                    </div>
                 )}
 
-                <br/>
-                <button type="submit">Register</button>
-            </form>
+                <form onSubmit={handleSubmit} className="auth-form">
+                    <div className="flex gap-4">
+                        <div className="form-group" style={{ flex: 1 }}>
+                            <label className="form-label" htmlFor="firstName">
+                                First name
+                            </label>
+                            <input
+                                id="firstName"
+                                type="text"
+                                value={firstName}
+                                onChange={e => setFirstName(e.target.value)}
+                                placeholder="John"
+                                required
+                                autoComplete="given-name"
+                            />
+                        </div>
+                        <div className="form-group" style={{ flex: 1 }}>
+                            <label className="form-label" htmlFor="lastName">
+                                Last name
+                            </label>
+                            <input
+                                id="lastName"
+                                type="text"
+                                value={lastName}
+                                onChange={e => setLastName(e.target.value)}
+                                placeholder="Doe"
+                                required
+                                autoComplete="family-name"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="form-group">
+                        <label className="form-label" htmlFor="email">
+                            Email address
+                        </label>
+                        <input
+                            id="email"
+                            type="email"
+                            value={email}
+                            onChange={e => setEmail(e.target.value)}
+                            placeholder="you@example.com"
+                            required
+                            autoComplete="email"
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label className="form-label" htmlFor="password">
+                            Password
+                        </label>
+                        <input
+                            id="password"
+                            type="password"
+                            value={password}
+                            onChange={e => setPassword(e.target.value)}
+                            onFocus={() => setShowPasswordRules(true)}
+                            onBlur={() => setShowPasswordRules(false)}
+                            placeholder="Create a strong password"
+                            required
+                            autoComplete="new-password"
+                        />
+                        
+                        {showPasswordRules && (
+                            <ul className="password-rules" style={{ 
+                                listStyle: 'none', 
+                                padding: 0, 
+                                marginTop: 'var(--spacing-3)',
+                                fontSize: 'var(--font-size-sm)'
+                            }}>
+                                {passwordRules.map((rule, i) => (
+                                    <li
+                                        key={i}
+                                        style={{
+                                            color: rule.test.test(password) 
+                                                ? 'var(--success-600)' 
+                                                : 'var(--text-muted)',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: 'var(--spacing-2)',
+                                            marginBottom: 'var(--spacing-1)'
+                                        }}
+                                    >
+                                        <span>{rule.test.test(password) ? '✓' : '○'}</span>
+                                        {rule.message}
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    </div>
+
+                    <button 
+                        type="submit" 
+                        className="btn btn-primary btn-lg w-full auth-submit"
+                        disabled={isLoading}
+                    >
+                        {isLoading ? (
+                            <>
+                                <span className="spinner"></span>
+                                Creating account...
+                            </>
+                        ) : (
+                            'Create account'
+                        )}
+                    </button>
+                </form>
+
+                <div className="auth-footer">
+                    <p>
+                        Already have an account?{' '}
+                        <Link to="/login">Sign in</Link>
+                    </p>
+                </div>
+            </div>
         </div>
     );
 };

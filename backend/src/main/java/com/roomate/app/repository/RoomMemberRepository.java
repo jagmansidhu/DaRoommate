@@ -1,6 +1,5 @@
 package com.roomate.app.repository;
 
-import com.roomate.app.entities.room.RoomEntity;
 import com.roomate.app.entities.room.RoomMemberEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -9,7 +8,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -17,6 +15,7 @@ import java.util.UUID;
 @Repository
 public interface RoomMemberRepository extends JpaRepository<RoomMemberEntity, UUID> {
     Optional<RoomMemberEntity> findByRoomIdAndUserId(UUID roomId, Long userId);
+
     boolean existsByRoomIdAndUserId(UUID roomId, Long userId);
 
     Optional<RoomMemberEntity> getRoomMemberEntityById(UUID id);
@@ -48,4 +47,7 @@ public interface RoomMemberRepository extends JpaRepository<RoomMemberEntity, UU
 
     @Query("SELECT rm FROM RoomMemberEntity rm WHERE rm.user.id = :userId")
     List<RoomMemberEntity> findAllByUserId(@Param("userId") Long userId);
+
+    @Query("SELECT rm FROM RoomMemberEntity rm WHERE rm.room.id = :roomId AND rm.user.email = :email")
+    Optional<RoomMemberEntity> findByRoomIdAndUserEmail(@Param("roomId") UUID roomId, @Param("email") String email);
 }
