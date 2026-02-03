@@ -218,12 +218,10 @@ const AppContent = () => {
 
             checkVerification();
         } else if (!isAuthenticated && !isLoading) {
-            // Reset verification state when logged out
             setUserVerified(null);
         }
     }, [isAuthenticated, isLoading]);
 
-    // Show loading while checking auth OR while checking verification for authenticated users
     if (isLoading || (isAuthenticated && userVerified === null)) {
         return (
             <div className="loading">

@@ -1,6 +1,5 @@
 package com.roomate.app.dto;
 
-import com.roomate.app.entities.room.RoomMemberEnum;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -13,4 +12,3 @@ public class CreateRoomRequest {
     private String address;
     private String description;
 }
-

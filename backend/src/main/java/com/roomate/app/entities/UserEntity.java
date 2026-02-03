@@ -21,9 +21,9 @@ import java.util.stream.Collectors;
 @Setter
 @Entity
 @Table(name = "users")
-public class UserEntity implements UserDetails{
+public class UserEntity implements UserDetails {
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String firstName;
     private String lastName;
@@ -35,26 +35,29 @@ public class UserEntity implements UserDetails{
     private String phone;
 
     @Column(nullable = false)
-    private boolean enabled = false;
+    private boolean enabled = true; // TODO: Set back to false to re-enable email verification
 
-//    @OneToOne(cascade = CascadeType.ALL)
-//    @JoinColumn(name = "addressId", referencedColumnName = "id")
-//    @JsonIgnore
-//    private AddressEntity address;
+    // @OneToOne(cascade = CascadeType.ALL)
+    // @JoinColumn(name = "addressId", referencedColumnName = "id")
+    // @JsonIgnore
+    // private AddressEntity address;
     // TODO Remove EAGER loading and add dto to user/login
     @ManyToMany(fetch = FetchType.EAGER)
     @JsonIgnore
     private Set<RolesEntity> roles = new HashSet<>();
-//    @OneToMany(mappedBy = "requester", cascade = {CascadeType.PERSIST, CascadeType.MERGE},
-//            orphanRemoval = true, fetch = FetchType.LAZY)
-//    @JsonIgnore
-//    private Set<FriendEntity> sentFriendRequests = new HashSet<>();
-//    @OneToMany(mappedBy = "addressee", cascade = {CascadeType.PERSIST, CascadeType.MERGE},
-//            orphanRemoval = true, fetch = FetchType.LAZY)
-//    @JsonIgnore
-//    private Set<FriendEntity> receivedFriendRequests = new HashSet<>();
+    // @OneToMany(mappedBy = "requester", cascade = {CascadeType.PERSIST,
+    // CascadeType.MERGE},
+    // orphanRemoval = true, fetch = FetchType.LAZY)
+    // @JsonIgnore
+    // private Set<FriendEntity> sentFriendRequests = new HashSet<>();
+    // @OneToMany(mappedBy = "addressee", cascade = {CascadeType.PERSIST,
+    // CascadeType.MERGE},
+    // orphanRemoval = true, fetch = FetchType.LAZY)
+    // @JsonIgnore
+    // private Set<FriendEntity> receivedFriendRequests = new HashSet<>();
 
-    public UserEntity() {}
+    public UserEntity() {
+    }
 
     public UserEntity(String authId, String firstName, String lastName, String email, String phone) {
         this.firstName = firstName;
@@ -62,6 +65,7 @@ public class UserEntity implements UserDetails{
         this.email = email;
         this.phone = phone;
     }
+
     public UserEntity(Long id, String firstName, String lastName, String email) {
         this.id = id;
         this.firstName = firstName;
@@ -95,8 +99,10 @@ public class UserEntity implements UserDetails{
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         UserEntity that = (UserEntity) o;
         return Objects.equals(id, that.id) &&
                 Objects.equals(firstName, that.firstName) &&
@@ -127,8 +133,23 @@ public class UserEntity implements UserDetails{
         return email;
     }
 
-    @Override public boolean isAccountNonExpired() { return true; }
-    @Override public boolean isAccountNonLocked() { return true; }
-    @Override public boolean isCredentialsNonExpired() { return true; }
-    @Override public boolean isEnabled() { return enabled; }
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return enabled;
+    }
 }

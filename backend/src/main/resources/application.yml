@@ -3,35 +3,17 @@ spring:
     current-web-url: http://localhost:8085
   profiles:
     active: ${ACTIVE_PROFILE:dev}
-
-# Application-specific settings
-app:
-  cors:
-    # Comma-separated list of allowed frontend origins
-    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://127.0.0.1:3000}
-
-  jackson:
-    default-property-inclusion: non_null
-    serialization:
-      fail-on-empty-beans: false
-      close-closeable: true
-      flush-after-write-value: true
-      write-date-keys-as-timestamps: false
-    deserialization:
-      fail-on-unknown-properties: false
   datasource:
     url: jdbc:postgresql://${POSTGRESQL_HOST}:${POSTGRESQL_PORT}/${POSTGRESQL_DATABASE}
     username: ${POSTGRESQL_USERNAME}
     password: ${POSTGRESQL_PASSWORD}
-  jwt:
-    secret: ${JWT_KEY}
   flyway:
-    enabled: true
+    enabled: false
     locations: classpath:db/migration
     baseline-on-migrate: true
   jpa:
     open-in-view: false
-    generate-ddl: false
+    generate-ddl: true
     show-sql: true
     hibernate:
       ddl-auto: update
@@ -41,7 +23,7 @@ app:
       hibernate:
         globally_quoted_identifiers: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
-        formate_sql: true
+        format_sql: true
   mail:
     host: ${EMAIL_HOST}
     port: ${EMAIL_PORT}
@@ -58,12 +40,29 @@ app:
           starttls:
             enable: true
             required: true
-  logging:
-    level:
-      root: INFO
-      com.roomate.app: DEBUG
-    pattern:
-      console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level) %cyan(%logger{36}) - %msg%n"
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      fail-on-empty-beans: false
+      close-closeable: true
+      flush-after-write-value: true
+      write-date-keys-as-timestamps: false
+    deserialization:
+      fail-on-unknown-properties: false
+
+# Application-specific settings
+app:
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://127.0.0.1:3000}
+  jwt:
+    secret: ${JWT_KEY}
+
+logging:
+  level:
+    root: INFO
+    com.roomate.app: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level) %cyan(%logger{36}) - %msg%n"
 
 server:
   port: ${CONTAINER_PORT:8085}
@@ -78,20 +77,6 @@ server:
         http-only: true
         secure: true
         path: /
-
-      #    init:
-      #      mode: never #says if we should run data files
-      #      continue-on-error: false
-      #      schema-locations: classpath:/data/schema.sql
-      #      data-locations: classpath:/data/data.sql
-      #  servlet:
-      #    multipart:
-      #      enabled: true
-      #      max-file-size: 1000MB
-      #      max-request-size: 1000MB
-      #
-      #    verify:
-      #      host: ${VERIFY_EMAIL_HOST}
 
 # Actuator configuration for health checks (Railway/AWS)
 management:

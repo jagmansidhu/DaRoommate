@@ -49,7 +49,7 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
         UserEntity user = new UserEntity();
         String email = req.getEmail();
 
-        if(userExists(email)){
+        if (userExists(email)) {
             throw new DuplicateKeyException(email);
         }
 
@@ -57,15 +57,16 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
         user.setLastName(req.getLastName());
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(req.getPassword()));
-        user.setEnabled(false);
+        user.setEnabled(true); // TODO: Set back to false to re-enable email verification
         UserEntity savedUser = userRepository.save(user);
 
         String token = createToken(savedUser);
 
-        sendVerificationEmail(user.getEmail(), token);
+        // TODO: Uncomment to re-enable email verification
+        // sendVerificationEmail(user.getEmail(), token);
 
         return jwtService.generateToken(user);
-//        return "Successfully Logged in";
+        // return "Successfully Logged in";
     }
 
     @Override
@@ -145,7 +146,7 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
 
     // EFFECTS : Determines if profile is complete in the database
     @Override
-    public boolean isProfileCompleteInDatabase(String email ) {
+    public boolean isProfileCompleteInDatabase(String email) {
         UserEntity user = getUserEntityByEmail(email);
 
         boolean firstNameProvided = user.getFirstName() != null && !user.getFirstName().isEmpty();
@@ -156,7 +157,7 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
     }
 
     @Override
-    public UserEntity getUserEntityByEmail(String email){
+    public UserEntity getUserEntityByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
     }
@@ -167,8 +168,7 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
                 .map(user -> new User(
                         user.getEmail(),
                         user.getPassword(),
-                        getAuthorities(user)
-                ))
+                        getAuthorities(user)))
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
     }
 
