@@ -47,21 +47,20 @@
   border: 1px solid var(--border-light);
   border-radius: var(--radius-xl);
   padding: var(--spacing-6);
-  cursor: pointer;
+  cursor: default;
   transition: all var(--transition-normal);
   text-decoration: none;
   display: block;
 }
 
 .room-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-lg);
-  border-color: var(--primary-200);
-  text-decoration: none;
+  box-shadow: none;
+  transform: none;
+  border-color: var(--border-light);
 }
 
 [data-theme="dark"] .room-card:hover {
-  border-color: var(--primary-500);
+  border-color: var(--border-light);
 }
 
 .room-card-header {
@@ -204,7 +203,7 @@
 }
 
 .room-tab:hover {
-  color: var(--text-primary);
+  color: var(--text-tertiary);
   transform: none;
   box-shadow: none;
 }
@@ -260,7 +259,7 @@
 }
 
 .member-item:hover {
-  background-color: var(--bg-tertiary);
+  background-color: var(--bg-secondary);
 }
 
 .member-avatar {
@@ -344,7 +343,7 @@
 }
 
 .ledger-item:hover {
-  background-color: var(--bg-tertiary);
+  background-color: var(--bg-secondary);
 }
 
 .ledger-icon {
@@ -442,7 +441,7 @@
 }
 
 .grocery-item:hover {
-  background-color: var(--bg-tertiary);
+  background-color: transparent;
 }
 
 .grocery-checkbox {
@@ -519,10 +518,59 @@
   color: var(--text-tertiary);
 }
 
+/* Chore Date Groups */
+.chore-date-group {
+  margin-bottom: var(--spacing-4);
+}
+
+.chore-date-badge {
+  display: inline-block;
+  background-color: var(--primary-100);
+  color: var(--primary-700);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-1) var(--spacing-2);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--spacing-2);
+}
+
+[data-theme="dark"] .chore-date-badge {
+  background-color: rgba(99, 102, 241, 0.2);
+  color: var(--primary-300);
+}
+
+.chore-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-2);
+}
+
+/* Empty Message */
+.empty-message {
+  color: var(--text-tertiary);
+  font-style: italic;
+  padding: var(--spacing-4) 0;
+}
+
+/* Icon for bills */
+.item-icon-bill {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%236366f1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2' y='4' width='20' height='16' rx='2'/%3E%3Cpath d='M12 9v6'/%3E%3Cpath d='M9 12h6'/%3E%3C/svg%3E");
+}
+
 .chore-assignee {
   display: flex;
   align-items: center;
   gap: var(--spacing-2);
+}
+
+/* ==========================================
+   Room Button Hover Overrides (Clean UI)
+   ========================================== */
+.rooms-container .btn:hover,
+.room-card .btn:hover,
+.room-actions .btn:hover {
+  transform: none;
+  box-shadow: none;
 }
 
 /* ==========================================
@@ -759,14 +807,14 @@
 }
 
 .onboarding-card:hover {
-  transform: translateY(-8px);
-  box-shadow: var(--shadow-xl);
-  border-color: var(--primary-400);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary-300);
 }
 
 [data-theme="dark"] .onboarding-card:hover {
-  border-color: var(--primary-500);
-  box-shadow: 0 20px 40px rgba(99, 102, 241, 0.15);
+  border-color: var(--primary-400);
+  box-shadow: var(--shadow-lg);
 }
 
 .onboarding-icon {
