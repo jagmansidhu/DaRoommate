@@ -30,6 +30,7 @@ const RoomDetailsPage = ({
     const [userUtilities, setUserUtilities] = useState([]);
     const [memberId, setMemberId] = useState(null);
     const [isCustomChore, setIsCustomChore] = useState(false);
+    const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false);
 
     const resetChoreData = () => setChoreData({ choreName: '', frequency: 1, frequencyUnit: 'WEEKLY' });
 
@@ -259,51 +260,22 @@ const RoomDetailsPage = ({
 
     return (
         <div className="dashboard-container">
-            {/* Room Header */}
-            <div className="dashboard-header">
-                <h1>{room.name}</h1>
-                <p>{room.address}</p>
-            </div>
-
-            {/* Room Info Stats */}
-            <div className="dashboard-stats">
-                <div className="stat-card">
-                    <div className="stat-icon stat-icon-rooms"></div>
-                    <div className="stat-value">{room.members?.length || 0}/6</div>
-                    <div className="stat-label">Members</div>
+            {/* Room Header - Compact with member count */}
+            <div className="room-details-header">
+                <div className="room-details-title">
+                    <h1>{room.name}</h1>
+                    <p className="room-address-code">
+                        {room.address} <span className="room-code-inline">Code: <code>{room.roomCode}</code></span>
+                    </p>
                 </div>
-                <div className="stat-card">
-                    <div className="stat-icon stat-icon-chores"></div>
-                    <div className="stat-value">{Object.keys(choresByDate).length}</div>
-                    <div className="stat-label">Upcoming Chores</div>
-                </div>
-                <div className="stat-card">
-                    <div className="stat-icon stat-icon-bills"></div>
-                    <div className="stat-value">{userUtilities.length}</div>
-                    <div className="stat-label">Your Utilities</div>
+                <div className="room-member-count">
+                    <span className="member-count-value">{room.members?.length || 0}</span>
+                    <span className="member-count-label">/ 6 Members</span>
                 </div>
             </div>
 
+            {/* Members and Utilities Side by Side */}
             <div className="dashboard-content">
-                {/* Room Information */}
-                <div className="dashboard-section">
-                    <h3>Room Information</h3>
-                    <ul>
-                        <li>
-                            <div className="item-content">
-                                <div className="item-title">Description</div>
-                                <div className="item-meta">{room.description || 'No description'}</div>
-                            </div>
-                        </li>
-                        <li>
-                            <div className="item-content">
-                                <div className="item-title">Room Code</div>
-                                <div className="item-meta"><code>{room.roomCode}</code></div>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-
                 {/* Members */}
                 <div className="dashboard-section">
                     <h3>Members</h3>
@@ -320,7 +292,7 @@ const RoomDetailsPage = ({
                                         <span className={`role-badge ${member.role}`}>{member.role}</span>
                                     </div>
                                     {isSelf && member.role !== ROLES.HEAD_ROOMMATE && (
-                                        <button className="btn btn-danger" onClick={() => onLeaveRoom(member.id)}>
+                                        <button className="btn btn-danger btn-sm" onClick={() => onLeaveRoom(member.id)}>
                                             Leave
                                         </button>
                                     )}
@@ -329,13 +301,32 @@ const RoomDetailsPage = ({
                         })}
                     </div>
                 </div>
+
+                {/* Your Utilities */}
+                <div className="dashboard-section">
+                    <h3>Your Utilities</h3>
+                    {userUtilities.length === 0 ? (
+                        <p className="empty-message">No utilities assigned.</p>
+                    ) : (
+                        <ul>
+                            {userUtilities.map(u => (
+                                <li key={u.id}>
+                                    <div className="item-content">
+                                        <div className="item-title">{u.utilityName}</div>
+                                        <div className="item-meta">${u.utilityPrice.toFixed(2)}</div>
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </div>
             </div>
 
-            {/* Chores Section */}
+            {/* Upcoming Chores */}
             <div className="dashboard-section">
                 <h3>Upcoming Chores</h3>
                 {Object.keys(choresByDate).length === 0 ? (
-                    <p className="empty-message">No upcoming chores scheduled.</p>
+                    <p className="empty-message">No upcoming chores.</p>
                 ) : (
                     <div className="chores-list">
                         {Object.entries(choresByDate).map(([date, choresForDate]) => (
@@ -347,7 +338,6 @@ const RoomDetailsPage = ({
                                             <div className="chore-status-indicator pending"></div>
                                             <div className="chore-info">
                                                 <div className="chore-name">{chore.choreName}</div>
-                                                <div className="chore-meta">{chore.choreFrequencyUnitEnum}</div>
                                             </div>
                                         </div>
                                     ))}
@@ -358,52 +348,81 @@ const RoomDetailsPage = ({
                 )}
             </div>
 
-            {/* User Utilities */}
-            <div className="dashboard-section">
-                <h3>Your Assigned Utilities</h3>
-                {userUtilities.length === 0 ? (
-                    <p className="empty-message">You have no utilities assigned yet.</p>
-                ) : (
-                    <ul>
-                        {userUtilities.map(u => (
-                            <li key={u.id}>
-                                <div className="item-icon item-icon-bill"></div>
-                                <div className="item-content">
-                                    <div className="item-title">{u.utilityName}</div>
-                                    <div className="item-meta">${u.utilityPrice.toFixed(2)} - {u.description}</div>
-                                </div>
-                            </li>
-                        ))}
-                    </ul>
-                )}
-            </div>
-
-            {/* Management Actions */}
+            {/* Management Actions - Apple-style Action List */}
             {(isAssistantRoommate || isHeadRoommate) && (
                 <div className="dashboard-section">
                     <h3>Room Management</h3>
-                    <div className="form-actions">
-                        <button className="btn btn-secondary" onClick={() => setShowInviteModal(true)}>
-                            Invite User
-                        </button>
-                        <button className="btn btn-primary" onClick={() => setShowChoreModal(true)}>
-                            Create Chore
-                        </button>
-                        <button className="btn btn-primary" onClick={() => setShowUtilityModal(true)}>
-                            Add Utility
-                        </button>
-                        <button className="btn btn-secondary" onClick={() => setShowRemoveChoreModal(true)}>
-                            Remove Chore
-                        </button>
-                        <button className="btn btn-secondary" onClick={() => setShowRemoveUtilityModal(true)}>
-                            Remove Utility
-                        </button>
-                        {isHeadRoommate && (
-                            <button className="btn btn-danger" onClick={onDeleteRoom}>
-                                Delete Room
+                    
+                    {/* Add Actions Group */}
+                    <div className="action-group">
+                        <div className="action-group-label">Add New</div>
+                        <div className="action-list">
+                            <button className="action-item" onClick={() => setShowInviteModal(true)}>
+                                <div className="action-icon action-icon-invite"></div>
+                                <div className="action-content">
+                                    <div className="action-title">Invite Roommate</div>
+                                    <div className="action-description">Send an invitation by email</div>
+                                </div>
+                                <div className="action-chevron"></div>
                             </button>
-                        )}
+                            <button className="action-item" onClick={() => setShowChoreModal(true)}>
+                                <div className="action-icon action-icon-chore"></div>
+                                <div className="action-content">
+                                    <div className="action-title">Create Chore</div>
+                                    <div className="action-description">Schedule recurring chores</div>
+                                </div>
+                                <div className="action-chevron"></div>
+                            </button>
+                            <button className="action-item" onClick={() => setShowUtilityModal(true)}>
+                                <div className="action-icon action-icon-utility"></div>
+                                <div className="action-content">
+                                    <div className="action-title">Add Utility</div>
+                                    <div className="action-description">Track bills and split costs</div>
+                                </div>
+                                <div className="action-chevron"></div>
+                            </button>
+                        </div>
                     </div>
+
+                    {/* Remove Actions Group */}
+                    <div className="action-group">
+                        <div className="action-group-label">Remove</div>
+                        <div className="action-list">
+                            <button className="action-item" onClick={() => setShowRemoveChoreModal(true)}>
+                                <div className="action-icon action-icon-remove-chore"></div>
+                                <div className="action-content">
+                                    <div className="action-title">Remove Chore</div>
+                                    <div className="action-description">Delete a scheduled chore type</div>
+                                </div>
+                                <div className="action-chevron"></div>
+                            </button>
+                            <button className="action-item" onClick={() => setShowRemoveUtilityModal(true)}>
+                                <div className="action-icon action-icon-remove-utility"></div>
+                                <div className="action-content">
+                                    <div className="action-title">Remove Utility</div>
+                                    <div className="action-description">Delete a tracked utility</div>
+                                </div>
+                                <div className="action-chevron"></div>
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Danger Zone */}
+                    {isHeadRoommate && (
+                        <div className="action-group">
+                            <div className="action-group-label">Danger Zone</div>
+                            <div className="action-list action-list-danger">
+                                <button className="action-item action-item-danger" onClick={() => setShowDeleteConfirmModal(true)}>
+                                    <div className="action-icon action-icon-delete"></div>
+                                    <div className="action-content">
+                                        <div className="action-title">Delete Room</div>
+                                        <div className="action-description">Permanently remove this room</div>
+                                    </div>
+                                    <div className="action-chevron"></div>
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             )}
 
@@ -707,6 +726,42 @@ const RoomDetailsPage = ({
                         <div className="modal-actions">
                             <button className="btn btn-primary" onClick={handleInviteUser}>Send Invite</button>
                             <button className="btn btn-secondary" onClick={() => setShowInviteModal(false)}>Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Delete Room Confirmation Modal */}
+            {showDeleteConfirmModal && (
+                <div className="modal-overlay">
+                    <div className="modal">
+                        <div className="modal-header">
+                            <h3>Delete Room</h3>
+                            <button className="modal-close" onClick={() => setShowDeleteConfirmModal(false)}>×</button>
+                        </div>
+                        <div className="modal-body">
+                            <div className="delete-warning">
+                                <div className="delete-warning-icon"></div>
+                                <p className="delete-warning-title">Are you sure you want to delete this room?</p>
+                                <p className="delete-warning-message">
+                                    This will permanently delete <strong>"{room.name}"</strong> and remove all members, 
+                                    chores, and utilities. This action cannot be undone.
+                                </p>
+                            </div>
+                        </div>
+                        <div className="modal-actions">
+                            <button 
+                                className="btn btn-danger" 
+                                onClick={() => {
+                                    setShowDeleteConfirmModal(false);
+                                    onDeleteRoom();
+                                }}
+                            >
+                                Yes, Delete Room
+                            </button>
+                            <button className="btn btn-secondary" onClick={() => setShowDeleteConfirmModal(false)}>
+                                Cancel
+                            </button>
                         </div>
                     </div>
                 </div>

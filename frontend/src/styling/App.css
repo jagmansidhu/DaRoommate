@@ -347,6 +347,33 @@
   border-top: 1px solid var(--border-light);
 }
 
+/* Modal overlay alias (used in some components) */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: var(--z-modal-backdrop);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-4);
+  animation: fadeIn var(--transition-normal) ease-out;
+}
+
+/* Modal actions (button group at bottom) */
+.modal-actions {
+  display: flex;
+  justify-content: flex-start;
+  gap: var(--spacing-3);
+  padding: var(--spacing-6);
+  border-top: 1px solid var(--border-light);
+}
+
+/* Large modal variant */
+.modal-large {
+  max-width: 640px;
+}
+
 /* ==========================================
    Toast Notifications
    ========================================== */
