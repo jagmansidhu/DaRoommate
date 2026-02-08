@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import '../../styling/Dashboard.css';
 
 const PasswordReset = () => {
     const [data, setData] = useState(null);
@@ -32,7 +33,7 @@ const PasswordReset = () => {
     }
 
     useEffect(() => {
-        const checkProfileAndFetchData = async () => {
+        const fetchUserData = async () => {
             try {
                 const response = await axios.get(
                     `${process.env.REACT_APP_BASE_API_URL}/api/get-user`,
@@ -40,22 +41,22 @@ const PasswordReset = () => {
                 );
                 setData(response.data);
             } catch (err) {
-                console.error('Error fetching protected resource:', err);
+                console.error('Error fetching user data:', err);
                 setApiError("Failed to load user data.");
             } finally {
                 setApiLoading(false);
             }
         };
 
-        checkProfileAndFetchData();
-    }, [navigate]);
+        fetchUserData();
+    }, []);
 
     const handlePasswordReset = async (e) => {
         e.preventDefault();
 
-        const validationError = validatePassword(password);
-        if (validationError) {
-            setValidationError(validationError);
+        const validationErr = validatePassword(password);
+        if (validationErr) {
+            setValidationError(validationErr);
             return;
         }
 
@@ -71,11 +72,9 @@ const PasswordReset = () => {
             );
 
             if (response.status === 200) {
-                setSuccessMessage("Password reset successful ✅");
+                setSuccessMessage("Password updated successfully!");
                 setValidationError('');
                 setApiError('');
-
-                // redirect after 2 seconds
                 setTimeout(() => navigate('/profile'), 2000);
             } else {
                 setApiError("Password reset failed.");
@@ -86,85 +85,109 @@ const PasswordReset = () => {
         }
     };
 
+    if (apiLoading) {
+        return (
+            <div className="loading">
+                <div className="spinner spinner-lg"></div>
+                <p>Loading...</p>
+            </div>
+        );
+    }
+
     return (
-        <div className="container">
-            <form className="profile-form" onSubmit={handlePasswordReset}>
-                <div className="Label">
-                    <label>
-                        Email:
-                        <input
-                            type="email"
-                            value={data?.email || ''}
-                            disabled
-                        />
-                    </label>
-                </div>
+        <div className="dashboard-container">
+            <div className="dashboard-header">
+                <h1>Change Password</h1>
+                <p>Update your account password</p>
+            </div>
 
-                <br/>
-                <div className="Label">
-                    <label>
-                        Current Password:
-                        <input
-                            type="password"
-                            value={curPassword}
-                            onChange={e => setCurPassword(e.target.value)}
-                            required
-                        />
-                    </label>
-                </div>
+            <div className="dashboard-content" style={{ display: 'block', maxWidth: '600px' }}>
+                <div className="dashboard-section">
+                    {apiError && (
+                        <div className="alert alert-error" style={{ marginBottom: 'var(--spacing-4)' }}>
+                            {apiError}
+                        </div>
+                    )}
+                    {validationError && (
+                        <div className="alert alert-error" style={{ marginBottom: 'var(--spacing-4)' }}>
+                            {validationError}
+                        </div>
+                    )}
+                    {successMessage && (
+                        <div className="alert alert-success" style={{ marginBottom: 'var(--spacing-4)' }}>
+                            {successMessage} Redirecting...
+                        </div>
+                    )}
 
-                <br/>
-                <div className="Label">
-                    <label>
-                        New Password:
-                        <input
-                            type="password"
-                            value={password}
-                            onChange={e => setPassword(e.target.value)}
-                            onFocus={() => setShowPasswordRules(true)}
-                            required
-                        />
-                    </label>
-                </div>
+                    <form onSubmit={handlePasswordReset}>
+                        <div className="form-group">
+                            <label htmlFor="email">Email</label>
+                            <input
+                                type="email"
+                                id="email"
+                                className="form-input"
+                                value={data?.email || ''}
+                                disabled
+                            />
+                        </div>
 
-                {showPasswordRules && (
-                    <ul style={{ listStyle: "none", paddingLeft: 0 }}>
-                        {passwordRules.map((rule, i) => (
-                            <li
-                                key={i}
-                                style={{
-                                    color: rule.test.test(password) ? "green" : "red",
-                                    fontSize: "0.9em"
-                                }}
+                        <div className="form-group">
+                            <label htmlFor="curPassword">Current Password</label>
+                            <input
+                                type="password"
+                                id="curPassword"
+                                className="form-input"
+                                value={curPassword}
+                                onChange={e => setCurPassword(e.target.value)}
+                                required
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label htmlFor="newPassword">New Password</label>
+                            <input
+                                type="password"
+                                id="newPassword"
+                                className="form-input"
+                                value={password}
+                                onChange={e => setPassword(e.target.value)}
+                                onFocus={() => setShowPasswordRules(true)}
+                                required
+                            />
+                        </div>
+
+                        {showPasswordRules && (
+                            <ul className="password-rules">
+                                {passwordRules.map((rule, i) => (
+                                    <li
+                                        key={i}
+                                        className={rule.test.test(password) ? 'rule-valid' : 'rule-invalid'}
+                                    >
+                                        {rule.message}
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+
+                        <div className="form-actions">
+                            <button 
+                                type="submit" 
+                                className="btn btn-primary"
+                                disabled={apiLoading}
                             >
-                                {rule.message}
-                            </li>
-                        ))}
-                    </ul>
-                )}
-
-                {validationError && <p style={{ color: 'red' }}>{validationError}</p>}
-                {apiError && <p style={{ color: 'red' }}>{apiError}</p>}
-
-                <br/>
-                <button type="submit" disabled={apiLoading}>Update Profile</button>
-            </form>
-
-            {successMessage && (
-                <div style={{
-                    position: "fixed",
-                    bottom: "20px",
-                    right: "20px",
-                    background: "#4CAF50",
-                    color: "white",
-                    padding: "12px 20px",
-                    borderRadius: "6px",
-                    boxShadow: "0px 2px 6px rgba(0,0,0,0.2)",
-                    fontSize: "14px"
-                }}>
-                    {successMessage}
+                                Update Password
+                            </button>
+                            <button 
+                                type="button" 
+                                className="btn btn-secondary"
+                                onClick={() => navigate('/profile')}
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
                 </div>
-            )}
+            </div>
         </div>
     );
 };

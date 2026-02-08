@@ -1,6 +1,7 @@
-import {useNavigate} from "react-router-dom";
-import React, {useEffect, useState} from "react";
+import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
+import '../../styling/Dashboard.css';
 
 const Personal = () => {
     const navigate = useNavigate();
@@ -9,27 +10,26 @@ const Personal = () => {
     const [phone, setPhone] = useState('');
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
-
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(false);
 
     useEffect(() => {
-        const checkProfileAndFetchData = async () => {
+        const fetchUserData = async () => {
             try {
                 const response = await axios.get(`${process.env.REACT_APP_BASE_API_URL}/api/get-user`, {
                     withCredentials: true,
                 });
                 setData(response.data);
             } catch (err) {
-                console.error('Error fetching protected resource:', err);
+                console.error('Error fetching user data:', err);
                 setError(err);
             } finally {
                 setApiLoading(false);
             }
         };
 
-        checkProfileAndFetchData();
-    }, [navigate]);
+        fetchUserData();
+    }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -38,17 +38,17 @@ const Personal = () => {
         setSuccess(false);
 
         try {
-            const response = await axios.put(`${process.env.REACT_APP_BASE_API_URL}/api/profile/update_profile`, {
+            await axios.put(`${process.env.REACT_APP_BASE_API_URL}/api/profile/update_profile`, {
                 firstName,
                 lastName,
                 phone
             }, {
-                withCredentials: true, headers: {'Content-Type': 'application/json'},
+                withCredentials: true,
+                headers: { 'Content-Type': 'application/json' },
             });
 
             setSuccess(true);
-            navigate('/profile');
-
+            setTimeout(() => navigate('/profile'), 1500);
         } catch (err) {
             console.error('Error updating profile:', err);
             setError(err.response?.data?.message || 'Failed to update profile. Please try again.');
@@ -57,51 +57,93 @@ const Personal = () => {
         }
     };
 
-    return (<div>
-            <h1>Update Information</h1>
-            {error && <p style={{color: 'red'}}>{error}</p>}
-            {success && <p style={{color: 'green'}}>Profile updated successfully!</p>}
+    if (apiLoading && !data) {
+        return (
+            <div className="loading">
+                <div className="spinner spinner-lg"></div>
+                <p>Loading...</p>
+            </div>
+        );
+    }
 
-            <form className="profile-form" onSubmit={handleSubmit}>
-                <div>
-                    <label htmlFor="firstName">First Name:</label>
-                    <input
-                        type="text"
-                        id="firstName"
-                        value={firstName}
-                        placeholder={data?.firstName || 'Enter your first name'}
-                        onChange={(e) => setFirstName(e.target.value)}
-                    />
+    return (
+        <div className="dashboard-container">
+            <div className="dashboard-header">
+                <h1>Update Personal Information</h1>
+                <p>Update your name and contact details</p>
+            </div>
+
+            <div className="dashboard-content" style={{ display: 'block', maxWidth: '600px' }}>
+                <div className="dashboard-section">
+                    {error && (
+                        <div className="alert alert-error" style={{ marginBottom: 'var(--spacing-4)' }}>
+                            {error}
+                        </div>
+                    )}
+                    {success && (
+                        <div className="alert alert-success" style={{ marginBottom: 'var(--spacing-4)' }}>
+                            Profile updated successfully! Redirecting...
+                        </div>
+                    )}
+
+                    <form onSubmit={handleSubmit}>
+                        <div className="form-group">
+                            <label htmlFor="firstName">First Name</label>
+                            <input
+                                type="text"
+                                id="firstName"
+                                className="form-input"
+                                value={firstName}
+                                placeholder={data?.firstName || 'Enter your first name'}
+                                onChange={(e) => setFirstName(e.target.value)}
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label htmlFor="lastName">Last Name</label>
+                            <input
+                                type="text"
+                                id="lastName"
+                                className="form-input"
+                                value={lastName}
+                                placeholder={data?.lastName || 'Enter your last name'}
+                                onChange={(e) => setLastName(e.target.value)}
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label htmlFor="phoneNumber">Phone Number</label>
+                            <input
+                                type="text"
+                                id="phoneNumber"
+                                className="form-input"
+                                value={phone}
+                                placeholder={data?.phone || 'xxx-xxx-xxxx'}
+                                onChange={(e) => setPhone(e.target.value)}
+                            />
+                        </div>
+
+                        <div className="form-actions">
+                            <button 
+                                type="submit" 
+                                className="btn btn-primary"
+                                disabled={apiLoading}
+                            >
+                                {apiLoading ? 'Saving...' : 'Save Changes'}
+                            </button>
+                            <button 
+                                type="button" 
+                                className="btn btn-secondary"
+                                onClick={() => navigate('/profile')}
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
                 </div>
-                <br/>
-                <div>
-                    <label htmlFor="lastName">Last Name:</label>
-                    <input
-                        type="text"
-                        id="lastName"
-                        value={lastName}
-                        placeholder={data?.lastName || 'Enter your first name'}
-                        onChange={(e) => setLastName(e.target.value)}
-                    />
-                </div>
-                <br/>
-                <div>
-                    <label htmlFor="phoneNumber">Phone Number:</label>
-                    <input
-                        type="text"
-                        id="phoneNumber"
-                        value={phone}
-                        placeholder={data?.phone || 'xxx-xxx-xxxx'}
-                        onChange={(e) => setPhone(e.target.value)}
-                    />
-                </div>
-                <div>
-                    <button type="submit" disabled={apiLoading}>
-                        {apiLoading ? 'Saving...' : 'Complete'}
-                    </button>
-                </div>
-            </form>
-        </div>);
+            </div>
+        </div>
+    );
 };
 
 export default Personal;
