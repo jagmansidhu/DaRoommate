@@ -1,12 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import '../styling/Dashboard.css';
+import OnboardingPage from './OnboardingPage';
+import { useOnboarding } from '../App';
 
 const Dashboard = () => {
+    const { setIsOnboarding } = useOnboarding();
     const [email, setEmail] = useState(null);
     const [loading, setLoading] = useState(true);
     const [chores, setChores] = useState([]);
     const [utilities, setUtilities] = useState([]);
+    const [rooms, setRooms] = useState([]);
+    const [roomsLoaded, setRoomsLoaded] = useState(false);
+    const [showOnboarding, setShowOnboarding] = useState(false);
+    const [hasSeenOnboarding, setHasSeenOnboarding] = useState(() => {
+        return localStorage.getItem('hasSeenOnboarding') === 'true';
+    });
 
     useEffect(() => {
         axios.get(`${process.env.REACT_APP_BASE_API_URL}/user/status`, { withCredentials: true })
@@ -19,21 +28,50 @@ const Dashboard = () => {
 
     useEffect(() => {
         if (!email) return;
+        
+        // Fetch rooms to check if user has any
+        axios.get(`${process.env.REACT_APP_BASE_API_URL}/api/rooms`, { withCredentials: true })
+            .then(res => {
+                setRooms(res.data || []);
+                setRoomsLoaded(true);
+                // Show onboarding page if no rooms and hasn't seen it before
+                if ((res.data || []).length === 0 && !hasSeenOnboarding) {
+                    setShowOnboarding(true);
+                }
+            })
+            .catch(() => setRoomsLoaded(true));
+
         axios.get(`${process.env.REACT_APP_BASE_API_URL}/api/chores/user/me`, { withCredentials: true })
             .then(res => setChores(res.data || []))
             .catch(() => {});
         axios.get(`${process.env.REACT_APP_BASE_API_URL}/api/utility/user/me`, { withCredentials: true })
             .then(res => setUtilities(res.data || []))
             .catch(() => {});
-    }, [email]);
+    }, [email, hasSeenOnboarding]);
 
-    if (loading) {
+    // Sync onboarding state with context (to hide navbar)
+    useEffect(() => {
+        setIsOnboarding(showOnboarding);
+    }, [showOnboarding, setIsOnboarding]);
+
+    const handleOnboardingComplete = () => {
+        setShowOnboarding(false);
+        setHasSeenOnboarding(true);
+        localStorage.setItem('hasSeenOnboarding', 'true');
+    };
+
+    if (loading || !roomsLoaded) {
         return (
             <div className="loading">
                 <div className="spinner spinner-lg"></div>
-                <p>Loading dashboard...</p>
+                <p>Loading...</p>
             </div>
         );
+    }
+
+    // Show full-page onboarding for new users with no rooms
+    if (showOnboarding) {
+        return <OnboardingPage onComplete={handleOnboardingComplete} />;
     }
 
     const upcomingChores = chores.slice(0, 5);
@@ -50,23 +88,23 @@ const Dashboard = () => {
             {/* Stats Overview */}
             <div className="dashboard-stats">
                 <div className="stat-card">
-                    <div className="stat-icon">📋</div>
+                    <div className="stat-icon stat-icon-chores"></div>
                     <div className="stat-value">{chores.length}</div>
                     <div className="stat-label">Pending Chores</div>
                 </div>
                 <div className="stat-card">
-                    <div className="stat-icon">💰</div>
+                    <div className="stat-icon stat-icon-bills"></div>
                     <div className="stat-value">{utilities.length}</div>
                     <div className="stat-label">Upcoming Bills</div>
                 </div>
                 <div className="stat-card">
-                    <div className="stat-icon">🏠</div>
-                    <div className="stat-value">—</div>
+                    <div className="stat-icon stat-icon-rooms"></div>
+                    <div className="stat-value">{rooms.length}</div>
                     <div className="stat-label">Active Rooms</div>
                 </div>
                 <div className="stat-card">
-                    <div className="stat-icon">✓</div>
-                    <div className="stat-value">—</div>
+                    <div className="stat-icon stat-icon-complete"></div>
+                    <div className="stat-value">-</div>
                     <div className="stat-label">Completed This Week</div>
                 </div>
             </div>
@@ -80,7 +118,7 @@ const Dashboard = () => {
                         <ul>
                             {upcomingChores.map((chore, index) => (
                                 <li key={index}>
-                                    <div className="item-icon">📋</div>
+                                    <div className="item-icon item-icon-chore"></div>
                                     <div className="item-content">
                                         <div className="item-title">{chore.name || chore.title || 'Untitled Chore'}</div>
                                         <div className="item-meta">
@@ -91,7 +129,7 @@ const Dashboard = () => {
                             ))}
                         </ul>
                     ) : (
-                        <p>No upcoming chores. You're all caught up! 🎉</p>
+                        <p className="empty-message">No upcoming chores. You're all caught up!</p>
                     )}
                 </div>
 
@@ -102,19 +140,19 @@ const Dashboard = () => {
                         <ul>
                             {upcomingUtilities.map((utility, index) => (
                                 <li key={index}>
-                                    <div className="item-icon">💰</div>
+                                    <div className="item-icon item-icon-bill"></div>
                                     <div className="item-content">
                                         <div className="item-title">{utility.name || utility.title || 'Untitled Bill'}</div>
                                         <div className="item-meta">
                                             {utility.dueDate ? `Due: ${new Date(utility.dueDate).toLocaleDateString()}` : 'No due date'}
-                                            {utility.amount && ` • $${utility.amount}`}
+                                            {utility.amount && ` - $${utility.amount}`}
                                         </div>
                                     </div>
                                 </li>
                             ))}
                         </ul>
                     ) : (
-                        <p>No upcoming bills. All caught up! 💸</p>
+                        <p className="empty-message">No upcoming bills. All caught up!</p>
                     )}
                 </div>
             </div>
@@ -123,3 +161,5 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
+

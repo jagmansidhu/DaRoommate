@@ -16,9 +16,11 @@ import VerifyHandler from "./webpages/VerifyHandler";
 
 const ThemeContext = createContext();
 const AuthContext = createContext();
+const OnboardingContext = createContext();
 
 export const useTheme = () => useContext(ThemeContext);
 export const useAuth = () => useContext(AuthContext);
+export const useOnboarding = () => useContext(OnboardingContext);
 
 const ThemeProvider = ({children}) => {
     const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -51,21 +53,15 @@ const AuthProvider = ({children}) => {
                 });
 
                 if (res.ok) {
-                    // Verify it's actually JSON and has expected content
                     const contentType = res.headers.get("content-type");
                     if (contentType && contentType.indexOf("application/json") !== -1) {
                         const data = await res.json();
-                        // Assuming the backend returns { username: "..." } or similar on success
                         if (data && (data.username || data.email || data.authenticated === true)) {
                            setIsAuthenticated(true);
                         } else {
-                           // Valid JSON but unexpected content - treat as unauth
-                           // Unless the backend just returns 200 OK empty body? 
-                           // Step 128 showed it returns Map.of("username", user)
                            setIsAuthenticated(true);
                         }
                     } else {
-                         // Not JSON (likely HTML error page)
                          console.warn("Auth check returned non-JSON:", contentType);
                          setIsAuthenticated(false);
                     }
@@ -192,6 +188,7 @@ const AppContent = () => {
     const {isAuthenticated, isLoading, logout} = useAuth();
     const navigate = useNavigate();
     const [userVerified, setUserVerified] = useState(null); // null = unknown, true/false = known
+    const [isOnboarding, setIsOnboarding] = useState(false);
     const hideNavbarPaths = ['/complete-profile'];
 
     useProfileCompletionRedirect();
@@ -231,10 +228,11 @@ const AppContent = () => {
         );
     }
 
-    const shouldHideNavbar = hideNavbarPaths.includes(window.location.pathname);
+    const shouldHideNavbar = hideNavbarPaths.includes(window.location.pathname) || isOnboarding;
     const showLoggedOutNavbar = window.location.pathname === '/verify';
 
     return (
+        <OnboardingContext.Provider value={{isOnboarding, setIsOnboarding}}>
         <div className="App">
             {!shouldHideNavbar && (showLoggedOutNavbar ? <LoggedOutNavbar/> : (isAuthenticated ? <LoggedInNavbar/> :
                 <LoggedOutNavbar/>))}
@@ -271,11 +269,6 @@ const AppContent = () => {
                                 userVerified ? <RoomDetailsPageWrapper/> : <CheckEmailPage/>
                             ) : <Login/>
                         }/>
-                        {/*<Route path="/complete-profile" element={*/}
-                        {/*    isAuthenticated ? ( */}
-                        {/*        userVerified <CompleteProfile/>*/}
-                        {/*    ) : <Login/>}*/}
-                        {/*/>*/}
                         <Route path="/reset-password" element={isAuthenticated ? <PasswordReset/> : <Login/>}/>
                         <Route path="/update-personal" element={isAuthenticated ? <Personal/> : <Login/>}/>
                         <Route path="/login" element={<Login/>}/>
@@ -285,6 +278,7 @@ const AppContent = () => {
                 </div>
             </main>
         </div>
+        </OnboardingContext.Provider>
     );
 };
 

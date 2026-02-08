@@ -95,7 +95,11 @@ const Rooms = () => {
 
             <div className="rooms-grid">
                 {rooms.length === 0 ? (
-                    <div className="empty-state">No rooms found</div>
+                    <div className="room-empty-state">
+                        <div className="room-empty-icon room-icon-svg"></div>
+                        <h3>No rooms yet</h3>
+                        <p>Create a new room or join an existing one using the buttons above</p>
+                    </div>
                 ) : (
                     rooms.map((room) => {
                         const currentMember = room.members?.find((m) => m.userId === currentUser?.email);
