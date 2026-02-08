@@ -47,11 +47,12 @@ html {
    Hero Section
    ========================================== */
 .hero-section {
-  min-height: 100vh;
+  min-height: calc(100vh - 80px);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding-top: 80px;
+  padding: 40px 24px !important;
+  margin-top: -40px;
 }
 
 .hero-content {
@@ -130,7 +131,7 @@ html {
 }
 
 [data-theme="dark"] .hero-buttons .btn-secondary:hover {
-  background-color: rgba(20, 184, 166, 0.1);
+  background-color: rgba(37, 99, 235, 0.1);
 }
 
 /* ==========================================
@@ -287,8 +288,8 @@ html {
   }
 
   .hero-section {
-    min-height: auto;
-    padding: 120px 24px 80px;
+    min-height: calc(100vh - 60px);
+    padding: 40px 24px;
   }
 
   .hero-buttons {
